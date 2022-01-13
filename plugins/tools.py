@@ -201,13 +201,14 @@ async def _(e):
             reply_to=reply,
             attributes=[
                 DocumentAttributeVideo(
-                    duration=data["duration"] if data["duration"] < 60 else 60,
+                    duration=min(data["duration"], 60),
                     w=512,
                     h=512,
                     round_message=True,
                 )
             ],
         )
+
         await msg.delete()
         [os.remove(k) for k in [audio.name, thumb]]
     elif mediainfo(reply.media) == "gif" or mediainfo(reply.media).startswith("video"):
@@ -429,9 +430,9 @@ async def magic(event):
     match, id_ = match.split(), None
     data = {}
     if len(match) > 1:
-        data.update({"id": match[1]})
+        data["id"] = match[1]
     url = match[0]
-    data.update({"link": url})
+    data["link"] = url
     data = await async_searcher(
         "https://tiny.ultroid.tech/api/new",
         data=data,
